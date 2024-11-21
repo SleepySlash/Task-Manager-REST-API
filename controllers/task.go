@@ -21,6 +21,8 @@ type TaskController interface {
 	UpdateTheTask(w http.ResponseWriter, r *http.Request)
 	DeleteTheTask(w http.ResponseWriter, r *http.Request)
 	DeleteAllTheTasks(w http.ResponseWriter, r *http.Request)
+	MarkTheTaskComplete(w http.ResponseWriter, r *http.Request)
+	MarkTheTaskPending(w http.ResponseWriter, r *http.Request)
 }
 type taskcontroller struct {
 	service services.TaskService
@@ -172,4 +174,44 @@ func (c *taskcontroller) DeleteAllTheTasks(w http.ResponseWriter, r *http.Reques
 	}
 	w.WriteHeader(http.StatusFound)
 	w.Write([]byte("deleted all the tasks"))
+}
+
+func (c *taskcontroller) MarkTheTaskComplete(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-type", "application/json")
+	name := mux.Vars(r)["name"]
+	date := mux.Vars(r)["date"]
+	userid, err := middleware.GetIdFromContext(r.Context())
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusExpectationFailed)
+	}
+	result, err := c.service.MarkDone(userid, name, date)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	w.WriteHeader(http.StatusFound)
+	w.Write([]byte("marked the task complete"))
+	json.NewEncoder(w).Encode(result)
+}
+
+func (c *taskcontroller) MarkTheTaskPending(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-type", "application/json")
+	name := mux.Vars(r)["name"]
+	date := mux.Vars(r)["date"]
+	userid, err := middleware.GetIdFromContext(r.Context())
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusExpectationFailed)
+	}
+	result, err := c.service.MarkUnDone(userid, name, date)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	w.WriteHeader(http.StatusFound)
+	w.Write([]byte("marked the task pending"))
+	json.NewEncoder(w).Encode(result)
 }

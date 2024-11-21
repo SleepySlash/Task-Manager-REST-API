@@ -13,6 +13,8 @@ type TaskService interface {
 	DeleteTask(userid string, name string, date string) (model.Task, error)
 	DeleteAllTasks(userid string) error
 	UpdateTask(userid string, newTask string, name string, date string) (model.Task, error)
+	MarkDone(userid string, name string, date string) (model.Task, error)
+	MarkUnDone(userid string, name string, date string) (model.Task, error)
 }
 type taskService struct {
 	repo model.Tasks
@@ -101,7 +103,7 @@ func (t *taskService) UpdateTask(userid string, newTask string, name string, dat
 	}
 	return result, nil
 }
-func (t *taskService) MarkDone(userid string, newTask string, name string, date string) (model.Task, error) {
+func (t *taskService) MarkDone(userid string, name string, date string) (model.Task, error) {
 	var result model.Task
 	result, err := t.repo.Done(userid, name, date)
 	if err != nil {
@@ -111,7 +113,7 @@ func (t *taskService) MarkDone(userid string, newTask string, name string, date 
 	return result, nil
 }
 
-func (t *taskService) MarkUnDone(userid string, newTask string, name string, date string) (model.Task, error) {
+func (t *taskService) MarkUnDone(userid string, name string, date string) (model.Task, error) {
 	var result model.Task
 	result, err := t.repo.Undone(userid, name, date)
 	if err != nil {
