@@ -15,8 +15,10 @@ type userDB struct {
 	collection *mongo.Collection
 }
 
-func CreateUserRepo(coll *mongo.Collection) {
-
+func CreateUserRepo(coll *mongo.Collection) Users {
+	return &userDB{
+		collection: coll,
+	}
 }
 
 func (u *userDB) get(name string, password string) (User, error) {}

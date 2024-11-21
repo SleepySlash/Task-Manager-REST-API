@@ -1,7 +1,9 @@
 package main
 
 import (
+	"Task-Manager-REST-API/controllers"
 	"Task-Manager-REST-API/middleware"
+	"context"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -9,10 +11,16 @@ import (
 
 func main() {
 	router := mux.NewRouter()
+	client := middleware.DataSource()
+	defer client.Disconnect(context.Background())
+	users := controllers.User(client)
+	tasks := controllers.Tasker(client)
 
 	todo := router.PathPrefix("/todo").Subrouter()
 
 	router.HandleFunc("/health", health).Methods("GET")
+	router.HandleFunc("/login", users.GetTheUser).Methods("POST")
+	todo.HandleFunc("/getall", tasks.GetAllTheTasks).Methods("GET")
 
 	todo.Use(middleware.AuthMiddleware)
 

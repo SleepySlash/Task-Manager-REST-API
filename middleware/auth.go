@@ -67,7 +67,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func DataSource(collName string) *mongo.Client {
+func DataSource() *mongo.Client {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("error in loading the env")
