@@ -31,7 +31,10 @@ func Tasker(client *mongo.Client) TaskController {
 	}
 }
 
-func (c *taskcontroller) CreateNewTask(w http.ResponseWriter, r *http.Request)     {}
+func (c *taskcontroller) CreateNewTask(w http.ResponseWriter, r *http.Request)     {
+	w.Header().Set("Content-type","application/json")
+	
+}
 func (c *taskcontroller) GetTheTask(w http.ResponseWriter, r *http.Request)        {}
 func (c *taskcontroller) GetAllTheTasks(w http.ResponseWriter, r *http.Request)    {}
 func (c *taskcontroller) UpdateTheTask(w http.ResponseWriter, r *http.Request)     {}

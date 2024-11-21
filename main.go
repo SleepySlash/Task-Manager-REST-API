@@ -17,12 +17,16 @@ func main() {
 	tasks := controllers.Tasker(client)
 
 	todo := router.PathPrefix("/todo").Subrouter()
+	user := router.PathPrefix("/todo").Subrouter()
 
 	router.HandleFunc("/health", health).Methods("GET")
 	router.HandleFunc("/login", users.GetTheUser).Methods("POST")
+	router.HandleFunc("/register", users.GetTheUser).Methods("POST")
 	todo.HandleFunc("/getall", tasks.GetAllTheTasks).Methods("GET")
+	user.HandleFunc("/update", users.UpdateTheUser).Methods("PUT")
 
 	todo.Use(middleware.AuthMiddleware)
+	user.Use(middleware.AuthMiddleware)
 
 	http.ListenAndServe(":3000", router)
 }
