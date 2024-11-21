@@ -3,12 +3,12 @@ package services
 import "Task-Manager-REST-API/model"
 
 type UserService interface {
-	newUser(name string) (model.User, error)
-	getUser(name string) (model.User, error)
-	getAllUser() ([]model.User, error)
-	deleteUser(name string) (model.User, error)
-	deleteAllUser() error
-	updateUser(name string) (model.User, error)
+	NewUser(user model.User) (model.User, error)
+	GetUser(user model.User) (bool, error)
+	GetAllUser() ([]model.User, error)
+	DeleteUser(name string) (model.User, error)
+	DeleteAllUser() error
+	UpdateUser(name string, user model.User) (model.User, error)
 }
 type userService struct {
 	repo model.Users
@@ -19,9 +19,9 @@ func NewUserService(repo model.Users) UserService {
 		repo: repo,
 	}
 }
-func (t *userService) newUser(name string) (model.User, error)    {}
-func (t *userService) getUser(name string) (model.User, error)    {}
-func (t *userService) getAllUser() ([]model.User, error)          {}
-func (t *userService) deleteUser(name string) (model.User, error) {}
-func (t *userService) deleteAllUser() error                       {}
-func (t *userService) updateUser(name string) (model.User, error) {}
+func (t *userService) NewUser(user model.User) (model.User, error)                 {}
+func (t *userService) GetUser(user model.User) (bool, error)                       {}
+func (t *userService) GetAllUser() ([]model.User, error)                           {}
+func (t *userService) DeleteUser(name string) (model.User, error)                  {}
+func (t *userService) DeleteAllUser() error                                        {}
+func (t *userService) UpdateUser(name string, user model.User) (model.User, error) {}
