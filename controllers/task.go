@@ -1,11 +1,16 @@
 package controllers
 
 import (
+	"Task-Manager-REST-API/middleware"
 	"Task-Manager-REST-API/model"
 	"Task-Manager-REST-API/services"
+	"encoding/json"
+	"io"
+	"log"
 	"net/http"
 	"os"
 
+	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -31,12 +36,140 @@ func Tasker(client *mongo.Client) TaskController {
 	}
 }
 
-func (c *taskcontroller) CreateNewTask(w http.ResponseWriter, r *http.Request)     {
-	w.Header().Set("Content-type","application/json")
-	
+// Handler function to create a new task
+func (c *taskcontroller) CreateNewTask(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-type", "application/json")
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusExpectationFailed)
+		return
+	}
+	defer r.Body.Close()
+	taskName := string(body)
+
+	userid, err := middleware.GetIdFromContext(r.Context())
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusExpectationFailed)
+		return
+	}
+
+	result, err := c.service.NewTask(taskName, userid)
+	w.WriteHeader(http.StatusFound)
+	w.Write([]byte("Entered new task"))
+	json.NewEncoder(w).Encode(result)
 }
-func (c *taskcontroller) GetTheTask(w http.ResponseWriter, r *http.Request)        {}
-func (c *taskcontroller) GetAllTheTasks(w http.ResponseWriter, r *http.Request)    {}
-func (c *taskcontroller) UpdateTheTask(w http.ResponseWriter, r *http.Request)     {}
-func (c *taskcontroller) DeleteTheTask(w http.ResponseWriter, r *http.Request)     {}
-func (c *taskcontroller) DeleteAllTheTasks(w http.ResponseWriter, r *http.Request) {}
+
+// Handler function to get a specific task
+func (c *taskcontroller) GetTheTask(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-type", "application/json")
+	name := mux.Vars(r)["name"]
+	date := mux.Vars(r)["date"]
+	userid, err := middleware.GetIdFromContext(r.Context())
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusExpectationFailed)
+	}
+	result, err := c.service.GetTask(userid, name, date)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	w.WriteHeader(http.StatusFound)
+	w.Write([]byte("fetched the task"))
+	json.NewEncoder(w).Encode(result)
+}
+
+// Handler function to Get all the tasks of the user
+func (c *taskcontroller) GetAllTheTasks(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-type", "application/json")
+	userid, err := middleware.GetIdFromContext(r.Context())
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusExpectationFailed)
+		return
+	}
+	result, err := c.service.GetAllTasks(userid)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	w.WriteHeader(http.StatusFound)
+	w.Write([]byte("found all the tasks"))
+	json.NewEncoder(w).Encode(result)
+}
+
+// Handler function to update a specific task
+func (c *taskcontroller) UpdateTheTask(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-type", "application/json")
+	name := mux.Vars(r)["task"]
+	date := mux.Vars(r)["date"]
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer r.Body.Close()
+	newTask := string(body)
+	userid, err := middleware.GetIdFromContext(r.Context())
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusExpectationFailed)
+		return
+	}
+	result, err := c.service.UpdateTask(userid, newTask, name, date)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	w.WriteHeader(http.StatusFound)
+	w.Write([]byte("updated the task"))
+	json.NewEncoder(w).Encode(result)
+
+}
+
+// Handler function to delete a specific task
+func (c *taskcontroller) DeleteTheTask(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-type", "application/json")
+	name := mux.Vars(r)["task"]
+	date := mux.Vars(r)["date"]
+	userid, err := middleware.GetIdFromContext(r.Context())
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusExpectationFailed)
+		return
+	}
+	result, err := c.service.DeleteTask(userid, name, date)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	w.WriteHeader(http.StatusFound)
+	w.Write([]byte("updated the task"))
+	json.NewEncoder(w).Encode(result)
+}
+
+// Handler function to delete all the tasks of the user
+func (c *taskcontroller) DeleteAllTheTasks(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-type", "application/json")
+	userid, err := middleware.GetIdFromContext(r.Context())
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusExpectationFailed)
+		return
+	}
+	err = c.service.DeleteAllTasks(userid)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	w.WriteHeader(http.StatusFound)
+	w.Write([]byte("deleted all the tasks"))
+}

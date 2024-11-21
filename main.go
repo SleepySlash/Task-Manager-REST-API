@@ -13,17 +13,27 @@ func main() {
 	router := mux.NewRouter()
 	client := middleware.DataSource()
 	defer client.Disconnect(context.Background())
+
+	user := router.PathPrefix("/user").Subrouter()
+	todo := router.PathPrefix("/todo").Subrouter()
+
 	users := controllers.User(client)
 	tasks := controllers.Tasker(client)
-
-	todo := router.PathPrefix("/todo").Subrouter()
-	user := router.PathPrefix("/todo").Subrouter()
 
 	router.HandleFunc("/health", health).Methods("GET")
 	router.HandleFunc("/login", users.GetTheUser).Methods("POST")
 	router.HandleFunc("/register", users.GetTheUser).Methods("POST")
-	todo.HandleFunc("/getall", tasks.GetAllTheTasks).Methods("GET")
+	router.HandleFunc("/delete", users.DeleteAllTheUsers).Methods("DELETE")
+
 	user.HandleFunc("/update", users.UpdateTheUser).Methods("PUT")
+	user.HandleFunc("/delete", users.DeleteTheUser).Methods("DELETE")
+
+	todo.HandleFunc("/new", tasks.CreateNewTask).Methods("POST")
+	todo.HandleFunc("/get", tasks.GetTheTask).Methods("POST")
+	todo.HandleFunc("/getall", tasks.GetAllTheTasks).Methods("GET")
+	todo.HandleFunc("/update", tasks.UpdateTheTask).Methods("PUT")
+	todo.HandleFunc("/delete", tasks.DeleteTheTask).Methods("DELETE")
+	todo.HandleFunc("/deleteall", tasks.DeleteAllTheTasks).Methods("DELETE")
 
 	todo.Use(middleware.AuthMiddleware)
 	user.Use(middleware.AuthMiddleware)

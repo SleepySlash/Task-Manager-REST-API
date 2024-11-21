@@ -1,14 +1,16 @@
 package services
 
-import "Task-Manager-REST-API/model"
+import (
+	"Task-Manager-REST-API/model"
+)
 
 type TaskService interface {
-	newTask(name string) (model.Task, error)
-	getTask(name string) (model.Task, error)
-	getAllTasks() ([]model.Task, error)
-	deleteTask(name string) (model.Task, error)
-	deleteAllTasks() error
-	updateTask(name string) (model.Task, error)
+	NewTask(name string, userid string) (model.Task, error)
+	GetTask(userid string, name string, date string) (model.Task, error)
+	GetAllTasks(userid string) ([]model.Task, error)
+	DeleteTask(userid string, name string, date string) (model.Task, error)
+	DeleteAllTasks(userid string) error
+	UpdateTask(userid string, newTask string, name string, date string) (model.Task, error)
 }
 type taskService struct {
 	repo model.Tasks
@@ -19,9 +21,11 @@ func NewTaskService(repo model.Tasks) TaskService {
 		repo: repo,
 	}
 }
-func (t *taskService) newTask(name string) (model.Task, error)    {}
-func (t *taskService) getTask(name string) (model.Task, error)    {}
-func (t *taskService) getAllTasks() ([]model.Task, error)         {}
-func (t *taskService) deleteTask(name string) (model.Task, error) {}
-func (t *taskService) deleteAllTasks() error                      {}
-func (t *taskService) updateTask(name string) (model.Task, error) {}
+func (t *taskService) NewTask(name string, userid string) (model.Task, error) {
+}
+func (t *taskService) GetTask(userid string, name string, date string) (model.Task, error)    {}
+func (t *taskService) GetAllTasks(userid string) ([]model.Task, error)                        {}
+func (t *taskService) DeleteTask(userid string, name string, date string) (model.Task, error) {}
+func (t *taskService) DeleteAllTasks(userid string) error                                     {}
+func (t *taskService) UpdateTask(userid string, newTask string, name string, date string) (model.Task, error) {
+}
