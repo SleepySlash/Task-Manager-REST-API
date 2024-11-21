@@ -1,6 +1,7 @@
 package main
 
 import (
+	"Task-Manager-REST-API/middleware"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -9,7 +10,11 @@ import (
 func main() {
 	router := mux.NewRouter()
 
+	todo := router.PathPrefix("/todo").Subrouter()
+
 	router.HandleFunc("/health", health).Methods("GET")
+
+	todo.Use(middleware.AuthMiddleware)
 
 	http.ListenAndServe(":3000", router)
 }
