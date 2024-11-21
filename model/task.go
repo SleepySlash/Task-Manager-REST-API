@@ -10,6 +10,8 @@ type Tasks interface {
 	DeleteAll(userid string) error
 	Update(newTask Task, name string) (Task, error)
 	Get(theId string, theTask string, theDate string) (Task, error)
+	Done(theId string, theTask string, theDate string) (Task, error)
+	Undone(theId string, theTask string, theDate string) (Task, error)
 	All(theId string) ([]Task, error)
 }
 
@@ -28,6 +30,8 @@ func (t *taskDB) Delete(theId string, theTask string, theDate string) (Task, err
 func (t *taskDB) DeleteAll(userid string) error                                     {}
 func (t *taskDB) Update(newTask Task, name string) (Task, error)                    {}
 func (t *taskDB) Get(theId string, theTask string, theDate string) (Task, error)    {}
+func (t *taskDB) Done(theId string, theTask string, theDate string) (Task, error)   {}
+func (t *taskDB) Undone(theId string, theTask string, theDate string) (Task, error) {}
 func (t *taskDB) All(theId string) ([]Task, error) {
 
 }

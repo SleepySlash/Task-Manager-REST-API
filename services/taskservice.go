@@ -101,3 +101,22 @@ func (t *taskService) UpdateTask(userid string, newTask string, name string, dat
 	}
 	return result, nil
 }
+func (t *taskService) MarkDone(userid string, newTask string, name string, date string) (model.Task, error) {
+	var result model.Task
+	result, err := t.repo.Done(userid, name, date)
+	if err != nil {
+		log.Println("error while marking the task done")
+		return result, err
+	}
+	return result, nil
+}
+
+func (t *taskService) MarkUnDone(userid string, newTask string, name string, date string) (model.Task, error) {
+	var result model.Task
+	result, err := t.repo.Undone(userid, name, date)
+	if err != nil {
+		log.Println("error while marking the task undone")
+		return result, err
+	}
+	return result, nil
+}
