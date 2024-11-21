@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -8,6 +9,10 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 func CreateToken(username string) (string, error) {
@@ -60,4 +65,26 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		log.Println("Token is valid")
 		next.ServeHTTP(w, r)
 	})
+}
+
+func DataSource(collName string) *mongo.Client {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("error in loading the env")
+		return nil
+	}
+	log.Println("Loaded the env")
+
+	clientOptions := options.Client().ApplyURI(os.Getenv("MONGO_URI"))
+	mongoClient, err := mongo.Connect(context.Background(), clientOptions)
+	if err != nil {
+		log.Fatal("error in connecting to the db")
+	}
+	err = mongoClient.Ping(context.Background(), readpref.Primary())
+	if err != nil {
+		log.Fatal("ping failed", err)
+	}
+	log.Println("Ping Succesfull")
+	log.Println("Connection Established with MongoDB")
+	return mongoClient
 }
