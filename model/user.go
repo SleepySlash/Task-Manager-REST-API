@@ -70,7 +70,7 @@ func (u *userDB) Update(theUserId string, theUser User) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	log.Println("updated the user", updateRes)
+	log.Println("updated the user", updateRes.ModifiedCount)
 	return int(updateRes.ModifiedCount), nil
 }
 

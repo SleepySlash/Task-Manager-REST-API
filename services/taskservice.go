@@ -34,7 +34,6 @@ func (t *taskService) NewTask(name string, userid string) (model.Task, error) {
 		UserId: userid,
 		Name:   name,
 		Date:   formattedDate,
-		Status: "Pending",
 	}
 	err := t.repo.Create(task)
 	if err != nil {
@@ -93,15 +92,14 @@ func (t *taskService) UpdateTask(userid string, newTask string, name string, dat
 		UserId: userid,
 		Name:   newTask,
 		Date:   date,
-		Status: "pending",
 	}
 
 	result, err := t.repo.Update(updatedTask, name)
-	if err != nil {
+	if err != nil || result < 1 {
 		log.Println("error while updating the task")
-		return result, err
+		return updatedTask, err
 	}
-	return result, nil
+	return updatedTask, nil
 }
 func (t *taskService) MarkDone(userid string, name string, date string) (model.Task, error) {
 	var result model.Task
