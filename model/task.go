@@ -5,12 +5,12 @@ import (
 )
 
 type Tasks interface {
-	create(theTask Task) error
-	delete(theTask string) (Task, error)
-	deleteAll() error
-	update(theTask string) (Task, error)
-	get(theTask string) (Task, error)
-	all() ([]Task, error)
+	Create(theTask Task) error
+	Delete(theId string, theTask string, theDate string) (Task, error)
+	DeleteAll(userid string) error
+	Update(newTask Task, name string) (Task, error)
+	Get(theId string, theTask string, theDate string) (Task, error)
+	All(theId string) ([]Task, error)
 }
 
 type taskDB struct {
@@ -23,24 +23,11 @@ func CreateTaskRepo(coll *mongo.Collection) Tasks {
 	}
 }
 
-func (t *taskDB) create(theTask Task) error {
-
-}
-
-func (t *taskDB) delete(theTask string) (Task, error) {
-
-}
-func (t *taskDB) deleteAll() error {
-
-}
-
-func (t *taskDB) update(theTask string) (Task, error) {
-
-}
-
-func (t *taskDB) get(theTask string) (Task, error) {
-
-}
-func (t *taskDB) all() ([]Task, error) {
+func (t *taskDB) Create(theTask Task) error                                         {}
+func (t *taskDB) Delete(theId string, theTask string, theDate string) (Task, error) {}
+func (t *taskDB) DeleteAll(userid string) error                                     {}
+func (t *taskDB) Update(newTask Task, name string) (Task, error)                    {}
+func (t *taskDB) Get(theId string, theTask string, theDate string) (Task, error)    {}
+func (t *taskDB) All(theId string) ([]Task, error) {
 
 }
