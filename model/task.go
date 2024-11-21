@@ -32,6 +32,4 @@ func (t *taskDB) Update(newTask Task, name string) (Task, error)                
 func (t *taskDB) Get(theId string, theTask string, theDate string) (Task, error)    {}
 func (t *taskDB) Done(theId string, theTask string, theDate string) (Task, error)   {}
 func (t *taskDB) Undone(theId string, theTask string, theDate string) (Task, error) {}
-func (t *taskDB) All(theId string) ([]Task, error) {
-
-}
+func (t *taskDB) All(theId string) ([]Task, error)                                  {}

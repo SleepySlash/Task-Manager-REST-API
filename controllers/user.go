@@ -84,7 +84,7 @@ func (c *usercontroller) UpdateTheUser(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		w.WriteHeader(http.StatusExpectationFailed)
 	}
-	result, err := c.service.UpdateUser(userid, user)
+	ok, err := c.service.UpdateUser(userid, user)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -92,7 +92,7 @@ func (c *usercontroller) UpdateTheUser(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Write([]byte("updated the user info"))
 	w.WriteHeader(http.StatusAccepted)
-	json.NewEncoder(w).Encode(result)
+	json.NewEncoder(w).Encode(ok)
 }
 func (c *usercontroller) DeleteTheUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")

@@ -11,9 +11,9 @@ type UserService interface {
 	NewUser(user model.User) error
 	GetUser(user model.User) (string, error)
 	GetAllUser() ([]model.User, error)
-	DeleteUser(name string) (model.User, error)
+	DeleteUser(name string) (string, error)
 	DeleteAllUser() error
-	UpdateUser(name string, user model.User) (model.User, error)
+	UpdateUser(name string, user model.User) (bool, error)
 }
 type userService struct {
 	repo model.Users
@@ -58,14 +58,13 @@ func (t *userService) GetAllUser() ([]model.User, error) {
 	}
 	return result, nil
 }
-func (t *userService) DeleteUser(userid string) (model.User, error) {
-	var result model.User
-	result, err := t.repo.Delete(userid)
+func (t *userService) DeleteUser(userid string) (string, error) {
+	err := t.repo.Delete(userid)
 	if err != nil {
 		log.Fatal("error while fetching all the existing user")
-		return result, err
+		return "", err
 	}
-	return result, nil
+	return userid, nil
 
 }
 func (t *userService) DeleteAllUser() error {
@@ -76,12 +75,11 @@ func (t *userService) DeleteAllUser() error {
 	}
 	return nil
 }
-func (t *userService) UpdateUser(userid string, user model.User) (model.User, error) {
-	var result model.User
-	result, err := t.repo.Update(userid, user)
+func (t *userService) UpdateUser(userid string, user model.User) (bool, error) {
+	_, err := t.repo.Update(userid, user)
 	if err != nil {
 		log.Fatal("error while updating the user")
-		return result, err
+		return false, err
 	}
-	return result, nil
+	return true, nil
 }
