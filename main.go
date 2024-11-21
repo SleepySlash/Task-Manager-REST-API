@@ -34,6 +34,8 @@ func main() {
 	todo.HandleFunc("/update", tasks.UpdateTheTask).Methods("PUT")
 	todo.HandleFunc("/delete", tasks.DeleteTheTask).Methods("DELETE")
 	todo.HandleFunc("/deleteall", tasks.DeleteAllTheTasks).Methods("DELETE")
+	todo.HandleFunc("/done", tasks.MarkTheTaskComplete).Methods("DELETE")
+	todo.HandleFunc("/pending", tasks.MarkTheTaskPending).Methods("DELETE")
 
 	todo.Use(middleware.AuthMiddleware)
 	user.Use(middleware.AuthMiddleware)

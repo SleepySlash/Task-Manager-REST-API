@@ -3,12 +3,12 @@ package model
 import "go.mongodb.org/mongo-driver/mongo"
 
 type Users interface {
-	get(name string, password string) (User, error)
-	all() ([]User, error)
-	create(theUser User) error
-	update(theUser User) (User, error)
-	delete(theUser User) (User, error)
-	deleteAll() error
+	Get(theUser User) (bool, error)
+	All() ([]User, error)
+	Create(theUser User) error
+	Update(theUserId string, theUser User) (User, error)
+	Delete(theUserId string) (User, error)
+	DeleteAll() error
 }
 
 type userDB struct {
@@ -21,9 +21,9 @@ func CreateUserRepo(coll *mongo.Collection) Users {
 	}
 }
 
-func (u *userDB) get(name string, password string) (User, error) {}
-func (u *userDB) all() ([]User, error)                           {}
-func (u *userDB) create(theUser User) error                      {}
-func (u *userDB) update(theUser User) (User, error)              {}
-func (u *userDB) delete(theUser User) (User, error)              {}
-func (u *userDB) deleteAll() error                               {}
+func (u *userDB) Get(theUser User) (bool, error)                      {}
+func (u *userDB) All() ([]User, error)                                {}
+func (u *userDB) Create(theUser User) error                           {}
+func (u *userDB) Update(theUserId string, theUser User) (User, error) {}
+func (u *userDB) Delete(theUserId string) (User, error)               {}
+func (u *userDB) DeleteAll() error                                    {}
