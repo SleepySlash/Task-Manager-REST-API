@@ -15,6 +15,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
+// Create a jwt token while user login and write it onto the header for authentication purposes
 func CreateToken(userid string) (string, error) {
 	log.Println("Creating token for user:", userid)
 	secretKey := os.Getenv("SECRET_KEY")
@@ -32,6 +33,7 @@ func CreateToken(userid string) (string, error) {
 	return tokenString, nil
 }
 
+// Get userid from the jwt token
 func GetIdFromContext(ctx context.Context) (string, error) {
 	id, ok := ctx.Value("userid").(string)
 	if !ok {
@@ -40,6 +42,7 @@ func GetIdFromContext(ctx context.Context) (string, error) {
 	return id, nil
 }
 
+// Authentication function to be used by the router as middleware
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokenString := r.Header.Get("Authorization")
@@ -91,6 +94,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+// Establish the database connection
 func DataSource() *mongo.Client {
 	err := godotenv.Load()
 	if err != nil {
@@ -111,4 +115,15 @@ func DataSource() *mongo.Client {
 	log.Println("Ping Succesfull")
 	log.Println("Connection Established with MongoDB")
 	return mongoClient
+}
+
+// Request Logger
+func RequestLogger(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+
+		log.Printf("Method: %s,URL: %s,RemoteAddr: %s,UserAgent: %s,Time: %s", r.Method, r.URL, r.RemoteAddr, r.UserAgent(), start.Format(time.RFC1123))
+		next.ServeHTTP(w, r)
+		log.Printf("Completed in %v\n", time.Since(start))
+	})
 }

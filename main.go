@@ -5,7 +5,7 @@ import (
 	"Task-Manager-REST-API/middleware"
 	"context"
 	"net/http"
- 
+
 	"github.com/gorilla/mux"
 )
 
@@ -45,6 +45,7 @@ func main() {
 	todo.HandleFunc("/mark/done", tasks.MarkTheTaskComplete).Methods("DELETE")
 	todo.HandleFunc("/mark/pending", tasks.MarkTheTaskPending).Methods("DELETE")
 
+	router.Use(middleware.RequestLogger)
 	todo.Use(middleware.AuthMiddleware)
 	user.Use(middleware.AuthMiddleware)
 
