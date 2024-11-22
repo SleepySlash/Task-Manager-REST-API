@@ -18,6 +18,7 @@ type TaskController interface {
 	CreateNewTask(w http.ResponseWriter, r *http.Request)
 	GetTheTask(w http.ResponseWriter, r *http.Request)
 	GetAllTheTasks(w http.ResponseWriter, r *http.Request)
+	GetAllIncludingDone(w http.ResponseWriter, r *http.Request)
 	UpdateTheTask(w http.ResponseWriter, r *http.Request)
 	DeleteTheTask(w http.ResponseWriter, r *http.Request)
 	DeleteAllTheTasks(w http.ResponseWriter, r *http.Request)
@@ -29,7 +30,7 @@ type taskcontroller struct {
 }
 
 func Tasker(client *mongo.Client) TaskController {
-	db := client.Database(os.Getenv("TASK_DB")).Collection(os.Getenv("TASK_COLLECTION"))
+	db := client.Database(os.Getenv("DATABASE")).Collection(os.Getenv("TASK_COLLECTION"))
 	collection := model.CreateTaskRepo(db)
 
 	repo := services.NewTaskService(collection)
@@ -84,7 +85,7 @@ func (c *taskcontroller) GetTheTask(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
-// Handler function to Get all the tasks of the user
+// Handler function to Get all the tasks of the user which are pending
 func (c *taskcontroller) GetAllTheTasks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	userid, err := middleware.GetIdFromContext(r.Context())
@@ -94,6 +95,26 @@ func (c *taskcontroller) GetAllTheTasks(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	result, err := c.service.GetAllTasks(userid)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	w.WriteHeader(http.StatusFound)
+	w.Write([]byte("found all the tasks"))
+	json.NewEncoder(w).Encode(result)
+}
+
+// Handler function to Get all the tasks of the user
+func (c *taskcontroller) GetAllIncludingDone(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-type", "application/json")
+	userid, err := middleware.GetIdFromContext(r.Context())
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusExpectationFailed)
+		return
+	}
+	result, err := c.service.GetAllDoneInclusive(userid)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusBadRequest)

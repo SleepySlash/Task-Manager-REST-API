@@ -17,6 +17,7 @@ type Tasks interface {
 	Done(theId string, theTask string, theDate string) (Task, error)
 	Undone(theId string, theTask string, theDate string) (Task, error)
 	All(theId string) ([]Task, error)
+	AllTasks(theId string) ([]Task, error)
 }
 
 type taskDB struct {
@@ -57,9 +58,25 @@ func (t *taskDB) Get(theId string, theTask string, theDate string) (Task, error)
 	return res, nil
 }
 
-// Fetching all the tasks of a user from the database
+// Fetching all the tasks of a user which are pending from the database
 func (t *taskDB) All(theId string) ([]Task, error) {
-	cursor, err := t.collection.Find(context.TODO(), bson.D{{Key: "user_id", Value: theId}})
+	cursor, err := t.collection.Find(context.TODO(), bson.D{{Key: "user_id", Value: theId}, {Key: "status", Value: "pending"}})
+	if err != nil {
+		log.Fatal("error while creating a task")
+		return nil, err
+	}
+	defer cursor.Close(context.TODO())
+	var tasks []Task
+	err = cursor.All(context.TODO(), &tasks)
+	if err != nil {
+		return nil, err
+	}
+	return tasks, nil
+}
+
+// Fetching all the tasks of a user from the database
+func (t *taskDB) AllTasks(theId string) ([]Task, error) {
+	cursor, err := t.collection.Find(context.TODO(), bson.D{{Key: "user_id", Value: theId}, {Key: "status"}})
 	if err != nil {
 		log.Fatal("error while creating a task")
 		return nil, err

@@ -25,7 +25,7 @@ type usercontroller struct {
 }
 
 func User(client *mongo.Client) UserController {
-	db := client.Database(os.Getenv("USER_DB")).Collection(os.Getenv("USER_COLLECTION"))
+	db := client.Database(os.Getenv("DATABASE")).Collection(os.Getenv("USER_COLLECTION"))
 	collection := model.CreateUserRepo(db)
 
 	repo := services.NewUserService(collection)

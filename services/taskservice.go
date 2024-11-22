@@ -10,6 +10,7 @@ type TaskService interface {
 	NewTask(name string, userid string) (model.Task, error)
 	GetTask(userid string, name string, date string) (model.Task, error)
 	GetAllTasks(userid string) ([]model.Task, error)
+	GetAllDoneInclusive(userid string) ([]model.Task, error)
 	DeleteTask(userid string, name string, date string) (model.Task, error)
 	DeleteAllTasks(userid string) error
 	UpdateTask(userid string, newTask string, name string, date string) (model.Task, error)
@@ -28,6 +29,7 @@ func NewTaskService(repo model.Tasks) TaskService {
 
 // Service Layer Function for creating a new task
 func (t *taskService) NewTask(name string, userid string) (model.Task, error) {
+	// date format for the tasks is yyyy-mm-dd
 	createdtime := time.Now()
 	formattedDate := createdtime.Format("2006-01-02")
 	task := model.Task{
@@ -54,10 +56,21 @@ func (t *taskService) GetTask(userid string, name string, date string) (model.Ta
 	return result, nil
 }
 
-// Service Layer Function for getting all existing task of the user
+// Service Layer Function for getting all the tasks of the user which are pending
 func (t *taskService) GetAllTasks(userid string) ([]model.Task, error) {
-	var result []model.Task
+	var result []model.Task // the tasks array which will be returned to the user
 	result, err := t.repo.All(userid)
+	if err != nil {
+		log.Println("error while searching for all the tasks of the user")
+		return result, err
+	}
+	return result, nil
+}
+
+// Service Layer Function for getting all existing task of the user
+func (t *taskService) GetAllDoneInclusive(userid string) ([]model.Task, error) {
+	var result []model.Task // the tasks array which will be returned to the user
+	result, err := t.repo.AllTasks(userid)
 	if err != nil {
 		log.Println("error while searching for all the tasks of the user")
 		return result, err
@@ -101,6 +114,8 @@ func (t *taskService) UpdateTask(userid string, newTask string, name string, dat
 	}
 	return updatedTask, nil
 }
+
+// Service Layer Function for marking a task as done
 func (t *taskService) MarkDone(userid string, name string, date string) (model.Task, error) {
 	var result model.Task
 	result, err := t.repo.Done(userid, name, date)
@@ -111,6 +126,7 @@ func (t *taskService) MarkDone(userid string, name string, date string) (model.T
 	return result, nil
 }
 
+// Service Layer Function for marking a task as pending
 func (t *taskService) MarkUnDone(userid string, name string, date string) (model.Task, error) {
 	var result model.Task
 	result, err := t.repo.Undone(userid, name, date)
