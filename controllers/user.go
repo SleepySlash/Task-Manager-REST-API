@@ -49,19 +49,18 @@ func (c *usercontroller) CreateNewUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusAccepted)
 }
 func (c *usercontroller) GetTheUser(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-type", "application/json")
-	var user model.User
-	json.NewDecoder(r.Body).Decode(&user)
-	token, err := c.service.GetUser(user)
-
-	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	w.Header().Set("Authorization", "Bearer "+token)
-	w.Write([]byte("user logged in successfully"))
-	w.WriteHeader(http.StatusAccepted)
+    w.Header().Set("Content-type", "application/json")
+    var user model.User
+    json.NewDecoder(r.Body).Decode(&user)
+    token, err := c.service.GetUser(user)
+    if err != nil {
+        log.Println(err)
+        w.WriteHeader(http.StatusBadRequest)
+        return
+    }
+    w.Header().Set("Authorization", "Bearer "+token)
+    w.WriteHeader(http.StatusAccepted)
+    w.Write([]byte("user logged in successfully"))
 }
 func (c *usercontroller) GetAllTheUsers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")

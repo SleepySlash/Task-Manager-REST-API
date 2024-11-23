@@ -19,12 +19,12 @@ import (
 func CreateToken(userid string) (string, error) {
 	log.Println("Creating token for user:", userid)
 	secretKey := os.Getenv("SECRET_KEY")
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
-		jwt.MapClaims{
-			"userid": userid,
-			"exp":    time.Now().Add(time.Hour * 24).Unix(),
-		})
+	claims := jwt.MapClaims{
+		"userid": userid,
+		"exp":    time.Now().Add(time.Hour * 2).Unix(),
+	}
 
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(secretKey))
 	if err != nil {
 		return "", err
@@ -33,9 +33,14 @@ func CreateToken(userid string) (string, error) {
 	return tokenString, nil
 }
 
+// Define a custom type for context keys
+type contextKey string
+
+const userIDKey contextKey = "userid"
+
 // Get userid from the jwt token
 func GetIdFromContext(ctx context.Context) (string, error) {
-	id, ok := ctx.Value("userid").(string)
+	id, ok := ctx.Value(userIDKey).(string)
 	if !ok {
 		return "", fmt.Errorf("user id not found in the context")
 	}
@@ -45,8 +50,15 @@ func GetIdFromContext(ctx context.Context) (string, error) {
 // Authentication function to be used by the router as middleware
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		tokenString := r.Header.Get("Authorization")
-		if tokenString == "" {
+		authHeader := r.Header.Get("Authorization")
+		if authHeader == "" {
+			http.Error(w, "Forbidden", http.StatusUnauthorized)
+			return
+		}
+
+		// Remove "Bearer " prefix from the token string
+		tokenString := authHeader[len("Bearer "):]
+		if tokenString == authHeader {
 			http.Error(w, "Forbidden", http.StatusUnauthorized)
 			return
 		}
@@ -63,33 +75,33 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		if err != nil {
 			log.Println("Token parsing error:", err)
-			http.Error(w, "Forbidden", http.StatusUnauthorized)
+			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
 
 		if !token.Valid {
 			log.Println("Token is invalid")
-			http.Error(w, "Forbidden", http.StatusUnauthorized)
-			return
-		}
-
-		claims, ok := token.Claims.(jwt.MapClaims)
-		if !ok || !token.Valid {
-			log.Println("Invalid token claims")
-			http.Error(w, "Invalid token", http.StatusUnauthorized)
+			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
 
 		// Extract userid from claims
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok || !token.Valid {
+			log.Println("Invalid token claims")
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return
+		}
+
 		userID, ok := claims["userid"].(string)
 		if !ok {
 			log.Println("UserID missing in token claims")
-			http.Error(w, "Invalid token payload", http.StatusUnauthorized)
+			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
 
 		// Add userid to context
-		ctx := context.WithValue(r.Context(), "userid", userID)
+		ctx := context.WithValue(r.Context(), userIDKey, userID)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -122,7 +134,7 @@ func RequestLogger(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 
-		log.Printf("Method: %s,URL: %s,RemoteAddr: %s,UserAgent: %s,Time: %s", r.Method, r.URL, r.RemoteAddr, r.UserAgent(), start.Format(time.RFC1123))
+		log.Printf(" Method: %s\t URL: %s\t Time: %s\n RemoteAddr: %s\t UserAgent: %s\n", r.Method, r.URL, start.Format(time.RFC1123), r.RemoteAddr, r.UserAgent())
 		next.ServeHTTP(w, r)
 		log.Printf("Completed in %v\n", time.Since(start))
 	})

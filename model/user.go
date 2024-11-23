@@ -9,7 +9,7 @@ import (
 )
 
 type Users interface {
-	Get(theUser User) (bool, error)
+	Get(theUser User) (User, error)
 	All() ([]User, error)
 	Create(theUser User) error
 	Update(theUserId string, theUser User) (int, error)
@@ -27,15 +27,15 @@ func CreateUserRepo(coll *mongo.Collection) Users {
 	}
 }
 
-func (u *userDB) Get(theUser User) (bool, error) {
+func (u *userDB) Get(theUser User) (User, error) {
 	var res User
-	filter := bson.D{{Key: "username", Value: theUser.Username}, {Key: "password", Value: theUser.password}}
+	filter := bson.D{{Key: "username", Value: theUser.Username}, {Key: "password", Value: theUser.Password}}
 	err := u.collection.FindOne(context.TODO(), filter).Decode(&res)
 	if err != nil {
-		return false, err
+		return res, err
 	}
 	log.Println("found user in the db", res)
-	return true, nil
+	return res, nil
 }
 
 func (u *userDB) All() ([]User, error) {

@@ -42,14 +42,9 @@ func Tasker(client *mongo.Client) TaskController {
 // Handler function to create a new task
 func (c *taskcontroller) CreateNewTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusExpectationFailed)
-		return
-	}
-	defer r.Body.Close()
-	taskName := string(body)
+
+	taskName := r.FormValue("task")
+	log.Println("creating a todo for ", taskName)
 
 	userid, err := middleware.GetIdFromContext(r.Context())
 	if err != nil {
@@ -59,7 +54,12 @@ func (c *taskcontroller) CreateNewTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	result, err := c.service.NewTask(taskName, userid)
-	w.WriteHeader(http.StatusFound)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	w.WriteHeader(http.StatusAccepted)
 	w.Write([]byte("Entered new task"))
 	json.NewEncoder(w).Encode(result)
 }

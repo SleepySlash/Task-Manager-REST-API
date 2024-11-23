@@ -1,8 +1,8 @@
 package model
 
 type Task struct {
-	UserId string `bson:"user_id,omitempty"`
-	Name   string `bson:"name"`
-	Date   string `bson:"created_on"`
-	status string `bson:"status"`
+	UserId string `json:"userid,omitempty"`
+	Name   string `json:"name"`
+	Date   string `json:"created_on"`
+	status string `json:"status"`
 }

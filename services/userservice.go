@@ -36,13 +36,13 @@ func (t *userService) NewUser(user model.User) error {
 	return nil
 }
 func (t *userService) GetUser(user model.User) (string, error) {
-	ok, err := t.repo.Get(user)
-	if !ok || err != nil {
+	res, err := t.repo.Get(user)
+	if err != nil {
 		log.Fatal("error while fetching user")
 		return "", err
 	}
 
-	tokenString, err := middleware.CreateToken(user.UserId)
+	tokenString, err := middleware.CreateToken(res.UserId)
 	if err != nil {
 		log.Fatal("Error during the creation of the jwt token")
 		return "", err
