@@ -15,6 +15,7 @@ import (
 
 type TaskController interface {
 	CreateNewTask(w http.ResponseWriter, r *http.Request)
+	CreateNewTasks(w http.ResponseWriter, r *http.Request)
 	GetTheTask(w http.ResponseWriter, r *http.Request)
 	GetAllTheTasks(w http.ResponseWriter, r *http.Request)
 	GetAllIncludingDone(w http.ResponseWriter, r *http.Request)
@@ -60,6 +61,34 @@ func (c *taskcontroller) CreateNewTask(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusAccepted)
 	w.Write([]byte("Entered new task"))
+	json.NewEncoder(w).Encode(result)
+}
+
+// Handler function to create a multiple new task
+func (c *taskcontroller) CreateNewTasks(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-type", "application/json")
+	type taskArray struct {
+		Tasks []string `json:"tasks"`
+	}
+	var names taskArray
+	json.NewDecoder(r.Body).Decode(&names)
+	log.Println("creating a todos of ", names.Tasks)
+
+	userid, err := middleware.GetIdFromContext(r.Context())
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusExpectationFailed)
+		return
+	}
+
+	result, err := c.service.NewTasks(names.Tasks, userid)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	w.WriteHeader(http.StatusAccepted)
+	w.Write([]byte("Entered new tasks"))
 	json.NewEncoder(w).Encode(result)
 }
 

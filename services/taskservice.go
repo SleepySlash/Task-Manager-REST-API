@@ -8,11 +8,12 @@ import (
 
 type TaskService interface {
 	NewTask(name string, userid string) (model.Task, error)
+	NewTasks(name []string, userid string) ([]model.Task, error)
 	GetTask(userid string, name string, date string) (model.Task, error)
 	GetAllTasks(userid string) ([]model.Task, error)
 	GetAllDoneInclusive(userid string) ([]model.Task, error)
 	DeleteTask(userid string, name string, date string) (model.Task, error)
-	DeleteAllTasks(userid string) (string,error)
+	DeleteAllTasks(userid string) (string, error)
 	UpdateTask(userid string, newTask string, name string, date string) (model.Task, string)
 	MarkDone(userid string, name string, date string) (model.Task, error)
 	MarkUnDone(userid string, name string, date string) (model.Task, error)
@@ -44,6 +45,30 @@ func (t *taskService) NewTask(name string, userid string) (model.Task, error) {
 		return task, err
 	}
 	return task, nil
+}
+
+// Service Layer Function for creating a multiple new tasks
+func (t *taskService) NewTasks(names []string, userid string) ([]model.Task, error) {
+	// date format for the tasks is yyyy-mm-dd
+	createdtime := time.Now()
+	formattedDate := createdtime.Format(time.Stamp)
+	var tasks []model.Task
+	for _, taskname := range names {
+		var task model.Task
+
+		task.UserId = userid
+		task.Name = taskname
+		task.Date = formattedDate
+		task.Status = "pending"
+
+		tasks = append(tasks, task)
+	}
+	err := t.repo.CreateMany(tasks)
+	if err != nil {
+		log.Println("error during creation of mulitple tasks")
+		return tasks, err
+	}
+	return tasks, nil
 }
 
 // Service Layer Function for getting an existing task
@@ -92,16 +117,16 @@ func (t *taskService) DeleteTask(userid string, name string, date string) (model
 }
 
 // Service Layer Function for deleting all existing task of the user
-func (t *taskService) DeleteAllTasks(userid string) (string,error) {
-	count,err := t.repo.DeleteAll(userid)
+func (t *taskService) DeleteAllTasks(userid string) (string, error) {
+	count, err := t.repo.DeleteAll(userid)
 	if err != nil {
 		log.Println("error while deleting all the tasks of the user")
-		return "",err
+		return "", err
 	}
-	if count>1{
-		return "delted all the users",nil
+	if count > 1 {
+		return "delted all the users", nil
 	}
-	return "no users found to be deleted",nil
+	return "no users found to be deleted", nil
 }
 
 // Service Layer Function for updating an existing task

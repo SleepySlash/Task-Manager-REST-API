@@ -36,6 +36,7 @@ func main() {
 
 	// task related handlers, auth required
 	todo.HandleFunc("/new", tasks.CreateNewTask).Methods("POST")
+	todo.HandleFunc("/newtasks", tasks.CreateNewTasks).Methods("POST")
 	todo.HandleFunc("/get/{name}/{date}", tasks.GetTheTask).Methods("GET")
 	todo.HandleFunc("/gettasks", tasks.GetAllTheTasks).Methods("GET")
 	todo.HandleFunc("/getall", tasks.GetAllIncludingDone).Methods("GET")

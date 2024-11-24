@@ -11,8 +11,9 @@ import (
 
 type Tasks interface {
 	Create(theTask Task) error
+	CreateMany(theTask []Task) error
 	Delete(theId string, theTask string, theDate string) (Task, error)
-	DeleteAll(userid string) (int64,error)
+	DeleteAll(userid string) (int64, error)
 	Update(newTask Task, name string) (int, error)
 	Get(theId string, theTask string, theDate string) (Task, error)
 	Done(theId string, theTask string, theDate string) (Task, error)
@@ -31,11 +32,25 @@ func CreateTaskRepo(coll *mongo.Collection) Tasks {
 	}
 }
 
-// Creating a new the tasks of a user
+// Creating a new task of a user
 func (t *taskDB) Create(theTask Task) error {
 	_, err := t.collection.InsertOne(context.TODO(), theTask)
 	if err != nil {
 		log.Fatal("error while creating a task")
+		return err
+	}
+	return nil
+}
+
+// Creating a multiple new tasks of a user
+func (t *taskDB) CreateMany(theTasks []Task) error {
+	var tasks []interface{}
+	for _, task := range theTasks {
+		tasks = append(tasks, task)
+	}
+	_, err := t.collection.InsertMany(context.TODO(), tasks)
+	if err != nil {
+		log.Fatal("error while creating multiple tasks")
 		return err
 	}
 	return nil
@@ -107,14 +122,14 @@ func (t *taskDB) Delete(theId string, theTask string, theDate string) (Task, err
 }
 
 // Deleting all the task of a user from the database
-func (t *taskDB) DeleteAll(userid string) (int64,error) {
+func (t *taskDB) DeleteAll(userid string) (int64, error) {
 	res, err := t.collection.DeleteMany(context.TODO(), bson.D{{Key: "userid", Value: userid}})
 	if err != nil {
 		log.Fatal("error while creating a task")
-		return 0,err
+		return 0, err
 	}
 	log.Println("deleted all the tasks of the user", res.DeletedCount)
-	return res.DeletedCount,nil
+	return res.DeletedCount, nil
 }
 
 // Updating the task of a user
