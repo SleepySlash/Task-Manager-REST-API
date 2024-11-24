@@ -12,7 +12,7 @@ type TaskService interface {
 	GetAllTasks(userid string) ([]model.Task, error)
 	GetAllDoneInclusive(userid string) ([]model.Task, error)
 	DeleteTask(userid string, name string, date string) (model.Task, error)
-	DeleteAllTasks(userid string) error
+	DeleteAllTasks(userid string) (string,error)
 	UpdateTask(userid string, newTask string, name string, date string) (model.Task, string)
 	MarkDone(userid string, name string, date string) (model.Task, error)
 	MarkUnDone(userid string, name string, date string) (model.Task, error)
@@ -92,13 +92,16 @@ func (t *taskService) DeleteTask(userid string, name string, date string) (model
 }
 
 // Service Layer Function for deleting all existing task of the user
-func (t *taskService) DeleteAllTasks(userid string) error {
-	err := t.repo.DeleteAll(userid)
+func (t *taskService) DeleteAllTasks(userid string) (string,error) {
+	count,err := t.repo.DeleteAll(userid)
 	if err != nil {
 		log.Println("error while deleting all the tasks of the user")
-		return err
+		return "",err
 	}
-	return nil
+	if count>1{
+		return "delted all the users",nil
+	}
+	return "no users found to be deleted",nil
 }
 
 // Service Layer Function for updating an existing task

@@ -100,9 +100,15 @@ func (c *taskcontroller) GetAllTheTasks(w http.ResponseWriter, r *http.Request) 
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	w.WriteHeader(http.StatusFound)
-	w.Write([]byte("found all the tasks"))
-	json.NewEncoder(w).Encode(result)
+	if len(result) > 1 {
+		w.WriteHeader(http.StatusFound)
+		w.Write([]byte("found all the tasks"))
+		json.NewEncoder(w).Encode(result)
+	} else {
+		w.WriteHeader(http.StatusExpectationFailed)
+		w.Write([]byte("no tasks found"))
+		json.NewEncoder(w).Encode(result)
+	}
 }
 
 // Handler function to Get all the tasks of the user
@@ -121,9 +127,15 @@ func (c *taskcontroller) GetAllIncludingDone(w http.ResponseWriter, r *http.Requ
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	w.WriteHeader(http.StatusFound)
-	w.Write([]byte("found all the tasks"))
-	json.NewEncoder(w).Encode(result)
+	if len(result) > 1 {
+		w.WriteHeader(http.StatusFound)
+		w.Write([]byte("found all the tasks"))
+		json.NewEncoder(w).Encode(result)
+	} else {
+		w.WriteHeader(http.StatusExpectationFailed)
+		w.Write([]byte("no tasks found"))
+		json.NewEncoder(w).Encode(result)
+	}
 }
 
 // Handler function to update a specific task
@@ -182,14 +194,14 @@ func (c *taskcontroller) DeleteAllTheTasks(w http.ResponseWriter, r *http.Reques
 		w.WriteHeader(http.StatusExpectationFailed)
 		return
 	}
-	err = c.service.DeleteAllTasks(userid)
+	res, err := c.service.DeleteAllTasks(userid)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	w.WriteHeader(http.StatusFound)
-	w.Write([]byte("deleted all the tasks"))
+	w.Write([]byte(res))
 }
 
 func (c *taskcontroller) MarkTheTaskComplete(w http.ResponseWriter, r *http.Request) {

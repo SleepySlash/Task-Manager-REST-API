@@ -12,7 +12,7 @@ import (
 type Tasks interface {
 	Create(theTask Task) error
 	Delete(theId string, theTask string, theDate string) (Task, error)
-	DeleteAll(userid string) error
+	DeleteAll(userid string) (int64,error)
 	Update(newTask Task, name string) (int, error)
 	Get(theId string, theTask string, theDate string) (Task, error)
 	Done(theId string, theTask string, theDate string) (Task, error)
@@ -107,14 +107,14 @@ func (t *taskDB) Delete(theId string, theTask string, theDate string) (Task, err
 }
 
 // Deleting all the task of a user from the database
-func (t *taskDB) DeleteAll(userid string) error {
+func (t *taskDB) DeleteAll(userid string) (int64,error) {
 	res, err := t.collection.DeleteMany(context.TODO(), bson.D{{Key: "userid", Value: userid}})
 	if err != nil {
 		log.Fatal("error while creating a task")
-		return err
+		return 0,err
 	}
 	log.Println("deleted all the tasks of the user", res.DeletedCount)
-	return nil
+	return res.DeletedCount,nil
 }
 
 // Updating the task of a user

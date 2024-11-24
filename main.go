@@ -32,7 +32,7 @@ func main() {
 	// delete all user handler auth required
 	user.HandleFunc("/update", users.UpdateTheUser).Methods("PUT")
 	// delete the user handler auth required
-	user.HandleFunc("/delete", users.DeleteTheUser).Methods("DELETE")
+	// user.HandleFunc("/delete", users.DeleteTheUser).Methods("DELETE")
 
 	// task related handlers, auth required
 	todo.HandleFunc("/new", tasks.CreateNewTask).Methods("POST")
