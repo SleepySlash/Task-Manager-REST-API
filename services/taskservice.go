@@ -36,6 +36,7 @@ func (t *taskService) NewTask(name string, userid string) (model.Task, error) {
 		UserId: userid,
 		Name:   name,
 		Date:   formattedDate,
+		Status: "pending",
 	}
 	err := t.repo.Create(task)
 	if err != nil {
@@ -48,6 +49,7 @@ func (t *taskService) NewTask(name string, userid string) (model.Task, error) {
 // Service Layer Function for getting an existing task
 func (t *taskService) GetTask(userid string, name string, date string) (model.Task, error) {
 	var result model.Task
+	log.Println(userid,name,date)
 	result, err := t.repo.Get(userid, name, date)
 	if err != nil {
 		log.Println("error while searching for the task")

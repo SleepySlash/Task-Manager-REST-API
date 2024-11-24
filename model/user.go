@@ -64,7 +64,7 @@ func (u *userDB) Create(theUser User) error {
 
 func (u *userDB) Update(theUserId string, theUser User) (int, error) {
 	theUser.UserId = theUserId
-	filter := bson.D{{Key: "user_id", Value: theUserId}}
+	filter := bson.D{{Key: "userid", Value: theUserId}}
 	update := bson.D{{Key: "$set", Value: theUser}}
 	updateRes, err := u.collection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
@@ -75,7 +75,7 @@ func (u *userDB) Update(theUserId string, theUser User) (int, error) {
 }
 
 func (u *userDB) Delete(theUserId string) error {
-	res, err := u.collection.DeleteOne(context.TODO(), bson.D{{Key: "user_id", Value: theUserId}})
+	res, err := u.collection.DeleteOne(context.TODO(), bson.D{{Key: "userid", Value: theUserId}})
 	if err != nil {
 		return err
 	}

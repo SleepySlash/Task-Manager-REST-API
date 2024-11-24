@@ -69,6 +69,7 @@ func (c *taskcontroller) GetTheTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	name := mux.Vars(r)["name"]
 	date := mux.Vars(r)["date"]
+	log.Println(name,date)
 	userid, err := middleware.GetIdFromContext(r.Context())
 	if err != nil {
 		log.Println(err)
@@ -109,6 +110,7 @@ func (c *taskcontroller) GetAllTheTasks(w http.ResponseWriter, r *http.Request) 
 func (c *taskcontroller) GetAllIncludingDone(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	userid, err := middleware.GetIdFromContext(r.Context())
+	log.Print(userid)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusExpectationFailed)

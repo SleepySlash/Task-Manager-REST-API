@@ -25,7 +25,7 @@ func NewUserService(repo model.Users) UserService {
 	}
 }
 func (t *userService) NewUser(user model.User) error {
-	currentDate := time.Now().Format("20060102")
+	currentDate := time.Now().Format(time.Stamp)
 	userid := user.Username + currentDate
 	user.UserId = userid
 	err := t.repo.Create(user)

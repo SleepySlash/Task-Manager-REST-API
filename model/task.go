@@ -32,7 +32,6 @@ func CreateTaskRepo(coll *mongo.Collection) Tasks {
 
 // Creating a new the tasks of a user
 func (t *taskDB) Create(theTask Task) error {
-	theTask.status = "pending"
 	_, err := t.collection.InsertOne(context.TODO(), theTask)
 	if err != nil {
 		log.Fatal("error while creating a task")
@@ -48,19 +47,19 @@ func (t *taskDB) Get(theId string, theTask string, theDate string) (Task, error)
 		Name:   theTask,
 		Date:   theDate,
 	}
-	filter := bson.D{{Key: "user_id", Value: theDate}, {Key: "Name", Value: theTask}, {Key: "Date", Value: theDate}}
+	filter := bson.D{{Key: "userid", Value: theId}, {Key: "name", Value: theTask}, {Key: "date", Value: theDate}}
 	var res Task
 	err := t.collection.FindOne(context.Background(), filter).Decode(&res)
 	if err != nil {
 		return task, err
 	}
-	log.Println("deleted the task")
+	log.Println("found the task")
 	return res, nil
 }
 
 // Fetching all the tasks of a user which are pending from the database
 func (t *taskDB) All(theId string) ([]Task, error) {
-	cursor, err := t.collection.Find(context.TODO(), bson.D{{Key: "user_id", Value: theId}, {Key: "status", Value: "pending"}})
+	cursor, err := t.collection.Find(context.TODO(), bson.D{{Key: "userid", Value: theId}, {Key: "status", Value: "pending"}})
 	if err != nil {
 		log.Fatal("error while creating a task")
 		return nil, err
@@ -76,7 +75,7 @@ func (t *taskDB) All(theId string) ([]Task, error) {
 
 // Fetching all the tasks of a user from the database
 func (t *taskDB) AllTasks(theId string) ([]Task, error) {
-	cursor, err := t.collection.Find(context.TODO(), bson.D{{Key: "user_id", Value: theId}, {Key: "status"}})
+	cursor, err := t.collection.Find(context.TODO(), bson.D{{Key: "userid", Value: theId}})
 	if err != nil {
 		log.Fatal("error while creating a task")
 		return nil, err
@@ -97,7 +96,7 @@ func (t *taskDB) Delete(theId string, theTask string, theDate string) (Task, err
 		Name:   theTask,
 		Date:   theDate,
 	}
-	filter := bson.D{{Key: "user_id", Value: theDate}, {Key: "Name", Value: theTask}, {Key: "Date", Value: theDate}}
+	filter := bson.D{{Key: "userid", Value: theId}, {Key: "name", Value: theTask}, {Key: "date", Value: theDate}}
 	_, err := t.collection.DeleteOne(context.Background(), filter)
 	if err != nil {
 		return task, err
@@ -108,7 +107,7 @@ func (t *taskDB) Delete(theId string, theTask string, theDate string) (Task, err
 
 // Deleting all the task of a user from the database
 func (t *taskDB) DeleteAll(userid string) error {
-	res, err := t.collection.DeleteMany(context.TODO(), bson.D{{Key: "user_id", Value: userid}})
+	res, err := t.collection.DeleteMany(context.TODO(), bson.D{{Key: "userid", Value: userid}})
 	if err != nil {
 		log.Fatal("error while creating a task")
 		return err
@@ -119,8 +118,8 @@ func (t *taskDB) DeleteAll(userid string) error {
 
 // Updating the task of a user
 func (t *taskDB) Update(newTask Task, name string) (int, error) {
-	newTask.status = "pending"
-	filter := bson.D{{Key: "user_id", Value: newTask.UserId}, {Key: "name", Value: name}, {Key: "Date", Value: newTask.Date}}
+	newTask.Status = "pending"
+	filter := bson.D{{Key: "userid", Value: newTask.UserId}, {Key: "name", Value: name}, {Key: "date", Value: newTask.Date}}
 	update := bson.D{{Key: "$set", Value: newTask}}
 	upd, err := t.collection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
@@ -136,9 +135,9 @@ func (t *taskDB) Done(theId string, theTask string, theDate string) (Task, error
 		UserId: theId,
 		Name:   theTask,
 		Date:   theDate,
-		status: "Done",
+		Status: "Done",
 	}
-	filter := bson.D{{Key: "user_id", Value: theId}, {Key: "name", Value: theTask}, {Key: "Date", Value: theDate}}
+	filter := bson.D{{Key: "userid", Value: theId}, {Key: "name", Value: theTask}, {Key: "date", Value: theDate}}
 	update := bson.D{{Key: "$set", Value: completedTask}}
 	upd, err := t.collection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
@@ -155,9 +154,9 @@ func (t *taskDB) Undone(theId string, theTask string, theDate string) (Task, err
 		UserId: theId,
 		Name:   theTask,
 		Date:   theDate,
-		status: "Pending",
+		Status: "pending",
 	}
-	filter := bson.D{{Key: "user_id", Value: theId}, {Key: "name", Value: theTask}, {Key: "Date", Value: theDate}}
+	filter := bson.D{{Key: "userid", Value: theId}, {Key: "name", Value: theTask}, {Key: "date", Value: theDate}}
 	update := bson.D{{Key: "$set", Value: pendingTask}}
 	upd, err := t.collection.UpdateOne(context.TODO(), filter, update)
 	if err != nil {

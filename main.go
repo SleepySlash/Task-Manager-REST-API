@@ -36,14 +36,14 @@ func main() {
 
 	// task related handlers, auth required
 	todo.HandleFunc("/new", tasks.CreateNewTask).Methods("POST")
-	todo.HandleFunc("/get", tasks.GetTheTask).Methods("POST")
+	todo.HandleFunc("/get/{name}/{date}", tasks.GetTheTask).Methods("GET")
 	todo.HandleFunc("/gettasks", tasks.GetAllTheTasks).Methods("GET")
 	todo.HandleFunc("/getall", tasks.GetAllIncludingDone).Methods("GET")
 	todo.HandleFunc("/update", tasks.UpdateTheTask).Methods("PUT")
+	todo.HandleFunc("/mark/done/{name}/{date}", tasks.MarkTheTaskComplete).Methods("PUT")
+	todo.HandleFunc("/mark/pending/{name}/{date}", tasks.MarkTheTaskPending).Methods("PUT")
 	todo.HandleFunc("/delete", tasks.DeleteTheTask).Methods("DELETE")
 	todo.HandleFunc("/deleteall", tasks.DeleteAllTheTasks).Methods("DELETE")
-	todo.HandleFunc("/mark/done", tasks.MarkTheTaskComplete).Methods("DELETE")
-	todo.HandleFunc("/mark/pending", tasks.MarkTheTaskPending).Methods("DELETE")
 
 	router.Use(middleware.RequestLogger)
 	todo.Use(middleware.AuthMiddleware)
