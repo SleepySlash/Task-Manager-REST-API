@@ -89,7 +89,7 @@ func (c *usercontroller) UpdateTheUser(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	w.Write([]byte("updated the user info"))
+	w.Write([]byte("updated the user info "))
 	w.WriteHeader(http.StatusAccepted)
 	json.NewEncoder(w).Encode(ok)
 }
@@ -106,10 +106,11 @@ func (c *usercontroller) DeleteTheUser(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	w.Write([]byte("deleted the user"))
+	w.Write([]byte("deleted the user "))
 	w.WriteHeader(http.StatusAccepted)
 	json.NewEncoder(w).Encode(result)
 }
+
 func (c *usercontroller) DeleteAllTheUsers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	err := c.service.DeleteAllUser()
