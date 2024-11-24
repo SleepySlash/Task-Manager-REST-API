@@ -39,10 +39,10 @@ func main() {
 	todo.HandleFunc("/get/{name}/{date}", tasks.GetTheTask).Methods("GET")
 	todo.HandleFunc("/gettasks", tasks.GetAllTheTasks).Methods("GET")
 	todo.HandleFunc("/getall", tasks.GetAllIncludingDone).Methods("GET")
-	todo.HandleFunc("/update", tasks.UpdateTheTask).Methods("PUT")
+	todo.HandleFunc("/update/{name}/{date}", tasks.UpdateTheTask).Methods("PUT")
 	todo.HandleFunc("/mark/done/{name}/{date}", tasks.MarkTheTaskComplete).Methods("PUT")
 	todo.HandleFunc("/mark/pending/{name}/{date}", tasks.MarkTheTaskPending).Methods("PUT")
-	todo.HandleFunc("/delete", tasks.DeleteTheTask).Methods("DELETE")
+	todo.HandleFunc("/delete/{name}/{date}", tasks.DeleteTheTask).Methods("DELETE")
 	todo.HandleFunc("/deleteall", tasks.DeleteAllTheTasks).Methods("DELETE")
 
 	router.Use(middleware.RequestLogger)

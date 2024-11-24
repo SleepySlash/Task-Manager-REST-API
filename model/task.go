@@ -6,6 +6,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Tasks interface {
@@ -118,10 +119,10 @@ func (t *taskDB) DeleteAll(userid string) error {
 
 // Updating the task of a user
 func (t *taskDB) Update(newTask Task, name string) (int, error) {
-	newTask.Status = "pending"
 	filter := bson.D{{Key: "userid", Value: newTask.UserId}, {Key: "name", Value: name}, {Key: "date", Value: newTask.Date}}
 	update := bson.D{{Key: "$set", Value: newTask}}
-	upd, err := t.collection.UpdateOne(context.TODO(), filter, update)
+	updOption := options.Update().SetUpsert(true)
+	upd, err := t.collection.UpdateOne(context.TODO(), filter, update, updOption)
 	if err != nil {
 		return 0, err
 	}

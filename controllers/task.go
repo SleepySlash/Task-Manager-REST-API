@@ -5,7 +5,6 @@ import (
 	"Task-Manager-REST-API/model"
 	"Task-Manager-REST-API/services"
 	"encoding/json"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -69,7 +68,7 @@ func (c *taskcontroller) GetTheTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	name := mux.Vars(r)["name"]
 	date := mux.Vars(r)["date"]
-	log.Println(name,date)
+	log.Println(name, date)
 	userid, err := middleware.GetIdFromContext(r.Context())
 	if err != nil {
 		log.Println(err)
@@ -130,25 +129,19 @@ func (c *taskcontroller) GetAllIncludingDone(w http.ResponseWriter, r *http.Requ
 // Handler function to update a specific task
 func (c *taskcontroller) UpdateTheTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
-	name := mux.Vars(r)["task"]
+	name := mux.Vars(r)["name"]
 	date := mux.Vars(r)["date"]
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		log.Println(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	defer r.Body.Close()
-	newTask := string(body)
+	newTask := r.FormValue("task")
+	log.Println("updating a todo,", name, " to ", newTask)
 	userid, err := middleware.GetIdFromContext(r.Context())
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusExpectationFailed)
 		return
 	}
-	result, err := c.service.UpdateTask(userid, newTask, name, date)
-	if err != nil {
-		log.Println(err)
+	result, er := c.service.UpdateTask(userid, newTask, name, date)
+	if er != "" {
+		log.Println(er)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -161,7 +154,7 @@ func (c *taskcontroller) UpdateTheTask(w http.ResponseWriter, r *http.Request) {
 // Handler function to delete a specific task
 func (c *taskcontroller) DeleteTheTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
-	name := mux.Vars(r)["task"]
+	name := mux.Vars(r)["name"]
 	date := mux.Vars(r)["date"]
 	userid, err := middleware.GetIdFromContext(r.Context())
 	if err != nil {
@@ -176,7 +169,7 @@ func (c *taskcontroller) DeleteTheTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusFound)
-	w.Write([]byte("updated the task"))
+	w.Write([]byte("deleted the task"))
 	json.NewEncoder(w).Encode(result)
 }
 

@@ -13,7 +13,7 @@ type TaskService interface {
 	GetAllDoneInclusive(userid string) ([]model.Task, error)
 	DeleteTask(userid string, name string, date string) (model.Task, error)
 	DeleteAllTasks(userid string) error
-	UpdateTask(userid string, newTask string, name string, date string) (model.Task, error)
+	UpdateTask(userid string, newTask string, name string, date string) (model.Task, string)
 	MarkDone(userid string, name string, date string) (model.Task, error)
 	MarkUnDone(userid string, name string, date string) (model.Task, error)
 }
@@ -49,7 +49,7 @@ func (t *taskService) NewTask(name string, userid string) (model.Task, error) {
 // Service Layer Function for getting an existing task
 func (t *taskService) GetTask(userid string, name string, date string) (model.Task, error) {
 	var result model.Task
-	log.Println(userid,name,date)
+	log.Println(userid, name, date)
 	result, err := t.repo.Get(userid, name, date)
 	if err != nil {
 		log.Println("error while searching for the task")
@@ -102,19 +102,20 @@ func (t *taskService) DeleteAllTasks(userid string) error {
 }
 
 // Service Layer Function for updating an existing task
-func (t *taskService) UpdateTask(userid string, newTask string, name string, date string) (model.Task, error) {
+func (t *taskService) UpdateTask(userid string, newTask string, name string, date string) (model.Task, string) {
 	updatedTask := model.Task{
 		UserId: userid,
 		Name:   newTask,
 		Date:   date,
+		Status: "pending",
 	}
 
 	result, err := t.repo.Update(updatedTask, name)
 	if err != nil || result < 1 {
 		log.Println("error while updating the task")
-		return updatedTask, err
+		return updatedTask, "error in update"
 	}
-	return updatedTask, nil
+	return updatedTask, ""
 }
 
 // Service Layer Function for marking a task as done
