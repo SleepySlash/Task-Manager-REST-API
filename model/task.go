@@ -17,6 +17,7 @@ type Tasks interface {
 	DeleteAll(userid string) (int64, error)
 	Update(newTask Task, name string) (int, error)
 	Get(theId string, theTask string, theDate string) (Task, error)
+	AllDone(theId string, theTask []string) ([]Task, error)
 	Done(theId string, theTask string, theDate string) (Task, error)
 	Undone(theId string, theTask string, theDate string) (Task, error)
 	All(theId string) ([]Task, error)
@@ -169,6 +170,65 @@ func (t *taskDB) Update(newTask Task, name string) (int, error) {
 	}
 	log.Println("updated the user", upd.ModifiedCount)
 	return int(upd.ModifiedCount), nil
+}
+
+// Marking all the given tasks of a user as done from the database
+func (t *taskDB) AllDone(theId string, theTasks []string) ([]Task, error) {
+
+	modelsChannel := make(chan *mongo.UpdateOneModel, len(theTasks))
+	var wg sync.WaitGroup
+	worker := func(tasks <-chan string) {
+		defer wg.Done()
+		for task := range tasks {
+			filter := bson.D{{Key: "userid", Value: theId}, {Key: "name", Value: task}}
+			update := bson.D{{Key: "$set", Value: bson.D{{Key: "status", Value: "Done"}}}}
+			modelsChannel <- mongo.NewUpdateOneModel().SetFilter(filter).SetUpdate(update)
+		}
+	}
+
+	tasksChannel := make(chan string, len(theTasks))
+	for i := 0; i < 4; i++ {
+		wg.Add(1)
+		go worker(tasksChannel)
+	}
+
+	for _, task := range theTasks {
+		tasksChannel <- task
+	}
+
+	close(tasksChannel)
+	wg.Wait()
+	close(modelsChannel)
+
+	var models []mongo.WriteModel
+	for update := range modelsChannel {
+		models = append(models, update)
+	}
+	bulkOptions := options.BulkWrite().SetOrdered(false)
+	_, err := t.collection.BulkWrite(context.TODO(), models, bulkOptions)
+	if err != nil {
+		log.Println("error while bulk writing the tasks as done")
+		return nil, err
+	}
+	filter := bson.D{
+		{Key: "userid", Value: theId},
+		{Key: "name", Value: bson.D{{Key: "$in", Value: theTasks}}},
+		{Key: "status", Value: "Done"},
+	}
+	cursor, err := t.collection.Find(context.Background(), filter)
+	if err != nil {
+		log.Println("error while retrieving updated tasks:", err)
+		return nil, err
+	}
+	defer cursor.Close(context.Background())
+	var updatedTasks []Task
+	if err = cursor.All(context.Background(), &updatedTasks); err != nil {
+		log.Println("error while decoding updated tasks:", err)
+		return nil, err
+	}
+
+	return updatedTasks, nil
+
 }
 
 // Marking the task of a user as done from the database

@@ -23,6 +23,7 @@ type TaskController interface {
 	DeleteTheTask(w http.ResponseWriter, r *http.Request)
 	DeleteAllTheTasks(w http.ResponseWriter, r *http.Request)
 	MarkTheTaskComplete(w http.ResponseWriter, r *http.Request)
+	MarkGivenTasksComplete(w http.ResponseWriter, r *http.Request)
 	MarkTheTaskPending(w http.ResponseWriter, r *http.Request)
 }
 type taskcontroller struct {
@@ -233,6 +234,31 @@ func (c *taskcontroller) DeleteAllTheTasks(w http.ResponseWriter, r *http.Reques
 	w.Write([]byte(res))
 }
 
+// Handler function to mark all the given tasks of the user as done
+func (c *taskcontroller) MarkGivenTasksComplete(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-type", "application/json")
+	type taskArray struct {
+		Tasks []string `json:"tasks"`
+	}
+	var names taskArray
+	json.NewDecoder(r.Body).Decode(&names)
+	userid, err := middleware.GetIdFromContext(r.Context())
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusExpectationFailed)
+	}
+	result, err := c.service.MarkAllDone(userid, names.Tasks)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	w.WriteHeader(http.StatusFound)
+	w.Write([]byte("marked the task complete"))
+	json.NewEncoder(w).Encode(result)
+}
+
+// Handler function to mark the given task of the user as done
 func (c *taskcontroller) MarkTheTaskComplete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	name := mux.Vars(r)["name"]
@@ -253,6 +279,7 @@ func (c *taskcontroller) MarkTheTaskComplete(w http.ResponseWriter, r *http.Requ
 	json.NewEncoder(w).Encode(result)
 }
 
+// Handler function to mark the given task of the user as undone
 func (c *taskcontroller) MarkTheTaskPending(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	name := mux.Vars(r)["name"]

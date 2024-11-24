@@ -15,6 +15,7 @@ type TaskService interface {
 	DeleteTask(userid string, name string, date string) (model.Task, error)
 	DeleteAllTasks(userid string) (string, error)
 	UpdateTask(userid string, newTask string, name string, date string) (model.Task, string)
+	MarkAllDone(userid string, names []string) ([]model.Task, error)
 	MarkDone(userid string, name string, date string) (model.Task, error)
 	MarkUnDone(userid string, name string, date string) (model.Task, error)
 }
@@ -144,6 +145,17 @@ func (t *taskService) UpdateTask(userid string, newTask string, name string, dat
 		return updatedTask, "error in update"
 	}
 	return updatedTask, ""
+}
+
+// Service Layer Function for marking all the given tasks as done
+func (t *taskService) MarkAllDone(userid string, names []string) ([]model.Task, error) {
+
+	result, err := t.repo.AllDone(userid, names)
+	if err != nil {
+		log.Println("error while marking the task done")
+		return result, err
+	}
+	return result, nil
 }
 
 // Service Layer Function for marking a task as done

@@ -41,6 +41,7 @@ func main() {
 	todo.HandleFunc("/gettasks", tasks.GetAllTheTasks).Methods("GET")
 	todo.HandleFunc("/getall", tasks.GetAllIncludingDone).Methods("GET")
 	todo.HandleFunc("/update/{name}/{date}", tasks.UpdateTheTask).Methods("PUT")
+	todo.HandleFunc("/mark/done", tasks.MarkGivenTasksComplete).Methods("PUT")
 	todo.HandleFunc("/mark/done/{name}/{date}", tasks.MarkTheTaskComplete).Methods("PUT")
 	todo.HandleFunc("/mark/pending/{name}/{date}", tasks.MarkTheTaskPending).Methods("PUT")
 	todo.HandleFunc("/delete/{name}/{date}", tasks.DeleteTheTask).Methods("DELETE")
