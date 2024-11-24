@@ -3,6 +3,7 @@ package model
 import (
 	"context"
 	"log"
+	"sync"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -44,15 +45,40 @@ func (t *taskDB) Create(theTask Task) error {
 
 // Creating a multiple new tasks of a user
 func (t *taskDB) CreateMany(theTasks []Task) error {
-	var tasks []interface{}
+	modelChannel := make(chan mongo.WriteModel, len(theTasks))
+
+	var wg sync.WaitGroup
+	worker := func(tasks <-chan Task) {
+		defer wg.Done()
+		for task := range tasks {
+			modelChannel <- mongo.NewInsertOneModel().SetDocument(task)
+		}
+	}
+	tasksChannel := make(chan Task, len(theTasks))
+	for i := 0; i < 4; i++ {
+		wg.Add(1)
+		go worker(tasksChannel)
+	}
 	for _, task := range theTasks {
-		tasks = append(tasks, task)
+		tasksChannel <- task
 	}
-	_, err := t.collection.InsertMany(context.TODO(), tasks)
-	if err != nil {
-		log.Fatal("error while creating multiple tasks")
-		return err
+	close(tasksChannel)
+	wg.Wait()
+	close(modelChannel)
+	var models []mongo.WriteModel
+	for i := range modelChannel {
+		models = append(models, i)
 	}
+	if len(models) > 0 {
+		bulkWriteOptions := options.BulkWrite().SetOrdered(false)
+		_, err := t.collection.BulkWrite(context.TODO(), models, bulkWriteOptions)
+		if err != nil {
+			log.Println("Error is storing the items into the DB (bulk write)")
+			return err
+		}
+		log.Println("bulk write executed")
+	}
+
 	return nil
 }
 
