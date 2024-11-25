@@ -24,17 +24,17 @@ This project is a task manager REST API built with Go and MongoDB. It provides e
 
 ## Project Structure
 
-.
-├── controllers
-│ ├── task.go
-│ ├── user.go
-├── middleware
-│ ├── auth.go
-├── model
-├── services
-├── main.go
-├── go.mod
-└── README.md
+    .
+    ├── controllers
+    │ ├── task.go
+    │ ├── user.go
+    ├── middleware
+    │ ├── auth.go
+    ├── model
+    ├── services
+    ├── main.go
+    ├── go.mod
+    └── README.md
 
 ## Setup
 
