@@ -1,12 +1,8 @@
 # Task-Manager-REST-API
 
----
-
 A REST API for managing tasks, built using Go and MongoDB.
 
 # Table of Contents
-
----
 
 - Overview
 - Features
@@ -17,13 +13,9 @@ A REST API for managing tasks, built using Go and MongoDB.
 
 ## Overview
 
----
-
 This project is a task manager REST API built with Go and MongoDB. It provides endpoints for users to manage their tasks, including creating, updating, and deleting tasks.
 
 ## Features
-
----
 
 - Create, update, and delete tasks
 - Mark tasks as complete or pending
@@ -31,8 +23,6 @@ This project is a task manager REST API built with Go and MongoDB. It provides e
 - User authentication and management
 
 ## Project Structure
-
----
 
 .
 ├── controllers
@@ -48,14 +38,11 @@ This project is a task manager REST API built with Go and MongoDB. It provides e
 
 ## Setup
 
----
-
 1.  Clone the repository:
 
     ```
     git clone https://github.com/SleepySlash/Task-Manager-REST-API.git
     cd Task-Manager-REST-API
-
     ```
 
 2.  Set up your environment variables by creating a .env file in the project root:
@@ -73,12 +60,9 @@ This project is a task manager REST API built with Go and MongoDB. It provides e
     go mod tidy
     Run the application:
     go run main.go
-
     ```
 
 ## Usage
-
----
 
 ### Endpoints
 
@@ -102,8 +86,6 @@ This project is a task manager REST API built with Go and MongoDB. It provides e
 * `PUT /todo/mark/pending/{name}/{date}` - Mark a specific task as pending
 * `DELETE /todo/delete/{name}/{date}` - Delete a specific task
 * `DELETE /todo/deleteall` - Delete all tasks
-
----
 
 ## License
 
