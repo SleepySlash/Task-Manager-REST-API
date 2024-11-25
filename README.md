@@ -31,6 +31,10 @@ This project is a task manager REST API built with Go and MongoDB. It provides e
     ├── middleware
     │ ├── auth.go
     ├── model
+    │ ├── task.go
+    │ ├── taskmodel.go
+    │ ├── user.go
+    │ ├── usermodel.go
     ├── services
     ├── main.go
     ├── go.mod
