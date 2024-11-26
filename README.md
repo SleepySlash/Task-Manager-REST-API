@@ -76,65 +76,122 @@ This project is a task manager REST API built with Go and MongoDB. It provides e
 
 ### Endpoints
 
-- **User Endpoints:**
+**User Endpoints:**
 
 * Register a new user
 
   - Method: POST
   - URL `/register`
   - Request Body (JSON):
-
-    ````{
+    ```
+      {
         "username": "exampleUser",
         "password": "examplePassword"
-      }```
-
-    ````
+      }
+    ```
 
 * Login a user
 
   - Method: POST
   - URL `/login`
   - Request Body (JSON):
-    ````{
+    ```
+      {
         "username": "exampleUser",
         "password": "examplePassword"
-      }```
-    ````
+      }
+    ```
 
 * Update user information
 
   - Method: PUT
   - URL `/user/update`
   - Request Body (JSON):
-    ````{
-        "username": "updatedUser",
-        "password": "updatedPassword"
-     }```
-    ````
+    ```
+      {
+         "username": "updatedUser",
+         "password": "updatedPassword"
+      }
+    ```
 
 * Delete a user
   - Method: DELETE
   - URL `/user/delete``
   - Request Body (JSON):
-    ````{
+    ```
+      {
         "username": "updatedUser",
-     }```
-    ````
+      }
+    ```
 
-- **Task Endpoints:**
+**Task Endpoints:**
 
-* `POST /todo/new` - Create a new task
-* `POST /todo/newtasks` - Create multiple new tasks
-* `GET /todo/get/{name}/{date}` - Get a specific task
-* `GET /todo/gettasks` - Get all pending tasks
-* `GET /todo/getall` - Get all tasks including done tasks
-* `PUT /todo/update/{name}/{date}` - Update a specific task
-* `PUT /todo/mark/done` - Mark given tasks as done
-* `PUT /todo/mark/done/{name}/{date}` - Mark a specific task as done
-* `PUT /todo/mark/pending/{name}/{date}` - Mark a specific task as pending
-* `DELETE /todo/delete/{name}/{date}` - Delete a specific task
-* `DELETE /todo/deleteall` - Delete all tasks
+* Create a new task
+  - Method : POST
+  - URL `/todo/new`
+  - Request Form Body:
+    ```
+      Key: task   Value: taskName
+    ```
+* Create multiple new tasks
+  - Method : POST
+  - URL `/todo/newtasks`
+  - Request Form Body:
+    ```
+    {
+      "tasks": ["Task1", "Task2"]
+    }
+    ```
+* Get a specific task
+
+  - Method : GET
+  - URL `/todo/get/{name}/{date}`
+
+* Get all pending tasks
+  - Method : GET
+  - URL `/todo/gettasks`
+
+* Get all tasks including done tasks
+
+  - Method : GET
+  - URL `/todo/getall`
+
+* Update a specific task
+  - Method : PUT
+  - URL `/todo/update/{name}/{date}`
+  - Request Body (JSON):
+    ```
+    {
+      "newTask": "Updated Task"
+    }
+    ```
+* Mark given tasks as done
+  - Method : PUT
+  - URL `/todo/mark/done`
+  - Request Body (JSON):
+    ```
+    {
+      "tasks": ["Task1", "Task2"]
+    }
+    ```
+* Mark a specific task as done
+
+  - Method : PUT
+  - URL `/todo/mark/done/{name}/{date}`
+
+* Mark a specific task as pending
+
+  - Method : PUT
+  - URL `/todo/mark/pending/{name}/{date}`
+
+* Delete a specific task
+
+  - Method : DELETE
+  - URL `/todo/delete/{name}/{date}`
+
+* Delete all tasks
+  - Method : DELETE
+  - URL `/todo/deleteall`
 
 ## License
 
