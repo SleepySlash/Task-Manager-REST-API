@@ -133,6 +133,7 @@ This project is a task manager REST API built with Go and MongoDB. It provides e
     ```
       Key: task   Value: taskName
     ```
+
 * Create multiple new tasks
   - Method : POST
   - URL `/todo/newtasks`
@@ -142,12 +143,14 @@ This project is a task manager REST API built with Go and MongoDB. It provides e
       "tasks": ["Task1", "Task2"]
     }
     ```
+
 * Get a specific task
 
   - Method : GET
   - URL `/todo/get/{name}/{date}`
 
 * Get all pending tasks
+
   - Method : GET
   - URL `/todo/gettasks`
 
@@ -165,6 +168,7 @@ This project is a task manager REST API built with Go and MongoDB. It provides e
       "newTask": "Updated Task"
     }
     ```
+
 * Mark given tasks as done
   - Method : PUT
   - URL `/todo/mark/done`
@@ -174,6 +178,7 @@ This project is a task manager REST API built with Go and MongoDB. It provides e
       "tasks": ["Task1", "Task2"]
     }
     ```
+    
 * Mark a specific task as done
 
   - Method : PUT
