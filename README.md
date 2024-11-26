@@ -78,10 +78,49 @@ This project is a task manager REST API built with Go and MongoDB. It provides e
 
 - **User Endpoints:**
 
-* `POST /register` - Register a new user
-* `POST /login` - Login a user
-* `PUT /user/update` - Update user information
-* `DELETE /user/delete` - Delete a user
+* Register a new user
+
+  - Method: POST
+  - URL `/register`
+  - Request Body (JSON):
+
+    ````{
+        "username": "exampleUser",
+        "password": "examplePassword"
+      }```
+
+    ````
+
+* Login a user
+
+  - Method: POST
+  - URL `/login`
+  - Request Body (JSON):
+    ````{
+        "username": "exampleUser",
+        "password": "examplePassword"
+      }```
+    ````
+
+* Update user information
+
+  - Method: PUT
+  - URL `/user/update`
+  - Request Body (JSON):
+    ````{
+        "username": "updatedUser",
+        "password": "updatedPassword"
+     }```
+    ````
+
+* Delete a user
+  - Method: DELETE
+  - URL `/user/delete``
+  - Request Body (JSON):
+    ````{
+        "username": "updatedUser",
+     }```
+    ````
 
 - **Task Endpoints:**
 
