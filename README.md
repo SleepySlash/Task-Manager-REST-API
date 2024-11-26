@@ -201,7 +201,3 @@ This project is a task manager REST API built with Go and MongoDB. It provides e
 ## License
 
 This project is licensed under the MIT License.
-
----
-
-Please let me know if there are any additional sections or specific details you would like to include in the README file.
