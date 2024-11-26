@@ -116,7 +116,7 @@ This project is a task manager REST API built with Go and MongoDB. It provides e
 
 * Delete a user
   - Method: DELETE
-  - URL `/user/delete``
+  - URL `/user/delete`
   - Request Body (JSON):
     ```
       {
