@@ -50,19 +50,22 @@ func GetIdFromContext(ctx context.Context) (string, error) {
 // Authentication function to be used by the router as middleware
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		authHeader := r.Header.Get("Authorization")
-		if authHeader == "" {
+
+		// Get the cookie from the header
+		cookie, err := r.Cookie("JWTToken")
+		if err != nil {
+			if err == http.ErrNoCookie {
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+			http.Error(w, "Bad Request", http.StatusUnauthorized)
+		}
+		// get the jwt token from the cookie
+		tokenString := cookie.Value
+		if tokenString == "" {
 			http.Error(w, "Forbidden", http.StatusUnauthorized)
 			return
 		}
-
-		// Remove "Bearer " prefix from the token string
-		tokenString := authHeader[len("Bearer "):]
-		if tokenString == authHeader {
-			http.Error(w, "Forbidden", http.StatusUnauthorized)
-			return
-		}
-
 		secretKey := os.Getenv("SECRET_KEY")
 		log.Println("Verifying token:", tokenString)
 

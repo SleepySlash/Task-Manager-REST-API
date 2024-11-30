@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -58,7 +59,17 @@ func (c *usercontroller) GetTheUser(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	w.Header().Set("Authorization", "Bearer "+token)
+	cookie := http.Cookie{
+		Name:     "JWTToken",
+		Value:    token,
+		Path:     "/",
+		Expires:  time.Now().Add(2 * time.Hour),
+		HttpOnly: true,
+		MaxAge:   7200,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+	}
+	http.SetCookie(w, &cookie)
 	w.WriteHeader(http.StatusAccepted)
 	w.Write([]byte("user logged in successfully"))
 }
